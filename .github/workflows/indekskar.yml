@@ -1,0 +1,97 @@
+name: IndeksKAR harian
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 05:00 WITA — perhitungan penuh (provinsi, 14 wilayah, hujan, arsip)
+    - cron: "0 3 * * *"    # 11:00 WITA — pembaruan jendela hujan (GFS) saja
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "full = semua · hujan = jendela hujan saja"
+        type: choice
+        options: [full, hujan]
+        default: full
+      only:
+        description: "Opsional: wilayah dipisah koma untuk uji coba (mis. banjarbaru)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: indekskar
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      TZ: Asia/Makassar
+      EE_PROJECT: indekskar
+      MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '0 3 * * *' && 'hujan' || 'full') }}
+      ONLY: ${{ inputs.only }}
+      OUT_DIR: ${{ github.workspace }}/site
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Ambil situs sebelumnya (cache, riwayat, arsip)
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: site
+
+      - name: Siapkan folder situs
+        run: |
+          rm -rf site/.git
+          mkdir -p site/store
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Pasang dependensi
+        run: pip install -r backend/requirements.txt
+
+      - name: Pasang kunci Earth Engine
+        env:
+          EE_KEY_JSON: ${{ secrets.EE_KEY_JSON }}
+        run: |
+          printf '%s' "$EE_KEY_JSON" > "$RUNNER_TEMP/ee-key.json"
+          SA=$(python -c "import json,sys;print(json.load(open(sys.argv[1]))['client_email'])" "$RUNNER_TEMP/ee-key.json")
+          echo "EE_KEY_FILE=$RUNNER_TEMP/ee-key.json" >> "$GITHUB_ENV"
+          echo "EE_SERVICE_ACCOUNT=$SA" >> "$GITHUB_ENV"
+
+      - name: Hitung IndeksKAR (Earth Engine)
+        working-directory: backend
+        run: python build_static.py "$MODE"
+
+      - name: Salin dashboard dengan alamat API baru
+        run: |
+          BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          OLD="https://indekskar-gee-459298563692.asia-southeast2.run.app"
+          for f in web/*.html; do
+            [ -e "$f" ] || continue
+            sed "s#${OLD}#${BASE}#g" "$f" > "site/$(basename "$f")"
+          done
+          [ -e site/dss_indekskar_kalsel.html ] && cp site/dss_indekskar_kalsel.html site/index.html
+          touch site/.nojekyll
+          echo "Situs: ${BASE}/   ·   API: ${BASE}/api/indekskar/banjarbaru"
+
+      - name: Hapus kunci
+        if: always()
+        run: rm -f "$RUNNER_TEMP/ee-key.json"
+
+      - name: Terbitkan ke GitHub Pages (cabang gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "IndeksKAR ${{ env.MODE }} · ${{ github.run_id }}"
