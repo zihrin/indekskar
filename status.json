@@ -1,0 +1,123 @@
+{
+ "mode": "hujan",
+ "mulai": "2026-10-31T08:59:54.597901Z",
+ "versi_backend": "2026-09-05c · lead GFS digeser ke 14:00 WITA + ENSO otomatis di frontend",
+ "langkah": [
+  {
+   "path": "api/hujan/banjarbaru",
+   "ok": true,
+   "http": 200,
+   "detik": 4.1
+  },
+  {
+   "path": "api/hujan/banjarmasin",
+   "ok": true,
+   "http": 200,
+   "detik": 4.4
+  },
+  {
+   "path": "api/hujan/banjar",
+   "ok": true,
+   "http": 200,
+   "detik": 4.5
+  },
+  {
+   "path": "api/hujan/baritokuala",
+   "ok": true,
+   "http": 200,
+   "detik": 4.1
+  },
+  {
+   "path": "api/hujan/tapin",
+   "ok": true,
+   "http": 200,
+   "detik": 3.3
+  },
+  {
+   "path": "api/hujan/hss",
+   "ok": true,
+   "http": 200,
+   "detik": 2.5
+  },
+  {
+   "path": "api/hujan/hst",
+   "ok": true,
+   "http": 200,
+   "detik": 2.9
+  },
+  {
+   "path": "api/hujan/hsu",
+   "ok": true,
+   "http": 200,
+   "detik": 2.5
+  },
+  {
+   "path": "api/hujan/tabalong",
+   "ok": true,
+   "http": 200,
+   "detik": 3.0
+  },
+  {
+   "path": "api/hujan/tala",
+   "ok": true,
+   "http": 200,
+   "detik": 3.7
+  },
+  {
+   "path": "api/hujan/tanbu",
+   "ok": true,
+   "http": 200,
+   "detik": 3.6
+  },
+  {
+   "path": "api/hujan/kotabaru",
+   "ok": true,
+   "http": 200,
+   "detik": 11.7
+  },
+  {
+   "path": "api/hujan/balangan",
+   "ok": true,
+   "http": 200,
+   "detik": 2.5
+  },
+  {
+   "path": "api/hujan/khdtk",
+   "ok": true,
+   "http": 200,
+   "detik": 2.2
+  },
+  {
+   "path": "api/mjo",
+   "ok": true,
+   "http": 200,
+   "detik": 0.5
+  },
+  {
+   "path": "api/iod",
+   "ok": true,
+   "http": 200,
+   "detik": 2.8
+  },
+  {
+   "path": "api/history/kabupaten",
+   "ok": true,
+   "http": 200,
+   "detik": 0.0
+  },
+  {
+   "path": "api/regions",
+   "ok": true,
+   "http": 200,
+   "detik": 0.0
+  },
+  {
+   "path": "api/versi",
+   "ok": true,
+   "http": 200,
+   "detik": 0.0
+  }
+ ],
+ "selesai": "2026-10-31T09:00:53.952737Z",
+ "gagal": 0
+}
